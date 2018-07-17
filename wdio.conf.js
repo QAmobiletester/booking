@@ -1,5 +1,5 @@
 exports.config = {
-  reporters: ['allure'],
+  reporters: ['dot', 'allure'],
   reporterOptions: {
       allure: {
           outputDir: './testResults/allure'
