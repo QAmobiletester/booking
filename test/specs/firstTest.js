@@ -1,7 +1,7 @@
 var assert = require('assert');
 
 describe('Booking.com testing: ', function() {
-/*
+
     it('User is able to specify age of each child', function () {
         browser.url('https://www.booking.com');
         browser.click('#xp__guests__toggle');
@@ -102,7 +102,7 @@ describe('Booking.com testing: ', function() {
         assert.equal(checkinDate, checkinDateSearch);
 
     });
-*/
+
     it('Resulting search entries are taken based on filter', function () {
 
         browser.url('https://www.booking.com');
