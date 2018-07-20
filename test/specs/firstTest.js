@@ -3,14 +3,22 @@ var assert = require('assert');
 describe('Booking.com testing: ', function() {
 
     it('User is able to specify age of each child', function () {
-        browser.url('https://www.booking.com');
+      //duplicated at each test. can reside at pre-actions for each one
+      browser.url('https://www.booking.com');
+        
         browser.click('#xp__guests__toggle');
 
         //set a random amount of children
         function randomChildAmount(){
+          /* here may be one of script unstablility reasons.
+          Default timeout is 500ms(read - http://webdriver.io/api/utility/waitForVisible.html), it may not be enough.
+          Set custom timeout and try to recheck script execution */
           browser.waitForVisible('#group_children option')
+
           var childrenList = $$('#group_children option')
+          // it is not required to parenthesize an expression..
           var i = (Math.floor(Math.random()*childrenList.length)+2)
+          //.. and indexing operator expression also
           var value = (childrenList[i]).getValue()
           return value
         }
@@ -18,6 +26,10 @@ describe('Booking.com testing: ', function() {
         //get the amount of "age input" fields
         var children = randomChildAmount().toString();
         $('#group_children').selectByVisibleText(children);
+
+        
+        /* "magic number"s. Google it and avoid literals usage in expressions.
+        */
         var childrenFinalAmount = $('#xp__guests__toggle span span:only-child').getText().slice(0, -8).trim();
         var ageInputs = $$('[name="age"]').length;
 
@@ -138,6 +150,8 @@ describe('Booking.com testing: ', function() {
 
         numberOfHotels = browser.getText('.sr_header h1')
         scoreList[randomScoreIndex].click();
+
+        // the same mentioned above - default timeout for wait* methods is 500ms. Make sure it is enough everywhere where waits applied
         browser.waitUntil(function(){
           var newNumberOfHotels = browser.getText('.sr_header h1')
           return numberOfHotels != newNumberOfHotels
@@ -172,6 +186,7 @@ describe('Booking.com testing: ', function() {
         var i = Math.floor(Math.random()*cities.length);
         cities[i].click();
 
+        //assertions can be shortened. Use logical-specific assertions
         assert.equal(browser.isVisible('#hotellist_inner'), true);
         assert.equal(browser.isVisible('.c2-calendar-body'), true);
         assert.equal(browser.isVisible('.room_details  .price'), false);
@@ -180,6 +195,8 @@ describe('Booking.com testing: ', function() {
         browser.click('.c2-calendar-close-button-icon');
 
         var hotelsPrices = $$("[data-click-store-id^='sr-compset']");
+
+        //hmmm.. var redefinition
         var i = Math.floor(Math.random()*hotelsPrices.length);
         hotelsPrices[i].click();
 
