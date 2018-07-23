@@ -2,24 +2,23 @@ var assert = require('assert');
 
 describe('Booking.com testing: ', function() {
 
+    beforeEach('open url', function() {
+        browser.url('https://www.booking.com');
+    }, 1000);
+
     it('User is able to specify age of each child', function () {
-      //duplicated at each test. can reside at pre-actions for each one
-      browser.url('https://www.booking.com');
-        
+
         browser.click('#xp__guests__toggle');
 
         //set a random amount of children
         function randomChildAmount(){
-          /* here may be one of script unstablility reasons.
-          Default timeout is 500ms(read - http://webdriver.io/api/utility/waitForVisible.html), it may not be enough.
-          Set custom timeout and try to recheck script execution */
-          browser.waitForVisible('#group_children option')
 
+          browser.waitForVisible('#group_children option', 4000)
           var childrenList = $$('#group_children option')
           // it is not required to parenthesize an expression..
-          var i = (Math.floor(Math.random()*childrenList.length)+2)
+          var i = Math.floor(Math.random()*childrenList.length)+2
           //.. and indexing operator expression also
-          var value = (childrenList[i]).getValue()
+          var value = childrenList[i].getValue()
           return value
         }
 
@@ -27,10 +26,8 @@ describe('Booking.com testing: ', function() {
         var children = randomChildAmount().toString();
         $('#group_children').selectByVisibleText(children);
 
-        
-        /* "magic number"s. Google it and avoid literals usage in expressions.
-        */
-        var childrenFinalAmount = $('#xp__guests__toggle span span:only-child').getText().slice(0, -8).trim();
+        var removeChildrenText = -8
+        var childrenFinalAmount = $('#xp__guests__toggle span span:only-child').getText().slice(0, removeChildrenText).trim();
         var ageInputs = $$('[name="age"]').length;
 
         //check the conditions
@@ -39,7 +36,7 @@ describe('Booking.com testing: ', function() {
     });
 
     it('User is provided with the same search form at search results page', function () {
-        browser.url('https://www.booking.com');
+
         var countryName = 'France';
         browser.setValue('#ss', countryName);
 
@@ -48,7 +45,8 @@ describe('Booking.com testing: ', function() {
         //get a randon month index (0-7)
         var nextMonthButton = $('.xp__dates__checkin .c2-button-further ');
         function randomMonth(){
-          var len = (Math.floor(Math.random()*7))
+          var months = 7
+          var len = (Math.floor(Math.random()*months))
           for (var i = 0; i < len; i ++){
             nextMonthButton.click()
           }
@@ -70,7 +68,8 @@ describe('Booking.com testing: ', function() {
         browser.click('.xp__dates-inner .sb-searchbox__input')[0];
         var checkinDayMonth = browser.getText('.c2-wrapper-s-checkin .sb-date-field__display');
         var checkoutDayMonth = browser.getText('.c2-wrapper-s-checkout .sb-date-field__display');
-        var year = $$('.xp__dates__checkin .c2-month-header')[monthIndex].getText().slice(-4);
+        var removeMonthText = -4;
+        var year = $$('.xp__dates__checkin .c2-month-header')[monthIndex].getText().slice(removeMonthText);
         var checkinDate = checkinDayMonth + ", " + year;
         var checkoutDate = checkoutDayMonth + ", " + year;
         checkinDate = Date.parse(checkinDate);
@@ -83,7 +82,7 @@ describe('Booking.com testing: ', function() {
         //set a random amount of children
         function randomChildAmount(){
           var childrenList = $$('#group_children option')
-          var i = (Math.floor(Math.random()*childrenList.length)+2)
+          var i = (Math.floor(Math.random()*childrenList.length)+2) //more than 2 children
           var value = (childrenList[i]).getValue()
           return value
         }
@@ -117,7 +116,6 @@ describe('Booking.com testing: ', function() {
 
     it('Resulting search entries are taken based on filter', function () {
 
-        browser.url('https://www.booking.com');
         var countryName = 'France';
         browser.setValue('#ss', countryName);
         browser.click('.sb-searchbox__button ');
@@ -131,18 +129,19 @@ describe('Booking.com testing: ', function() {
         browser.waitUntil(function(){
           var newNumberOfHotels = browser.getText('.sr_header h1')
           return numberOfHotels != newNumberOfHotels
-        })
+        }, 4000)
 
         starsList = $$('#filter_class .css-checkbox');
-        var numberOfStars = starsList[randomStarsIndex].getText().trim().slice(0,1);
+        var starNumber = 1
+        var numberOfStars = starsList[randomStarsIndex].getText().trim().slice(0,starNumber);
         var hotelsList = $$('.sr_item_content [class*="-sprite-ratings_stars"] + span');
         for (var i = 0; i < hotelsList.length; i++){
-          var hotelStars = hotelsList[i].getText().trim().slice(0,1)
+          var hotelStars = hotelsList[i].getText().trim().slice(0,starNumber)
           console.log('text for logs: ', hotelStars, numberOfStars)
           assert.equal(hotelStars, numberOfStars)
         }
 
-        (starsList[randomStarsIndex]).click();
+        starsList[randomStarsIndex].click();
 
         //select review score option
         var scoreList = $$("#filter_review [data-id^='review_score']");
@@ -155,14 +154,17 @@ describe('Booking.com testing: ', function() {
         browser.waitUntil(function(){
           var newNumberOfHotels = browser.getText('.sr_header h1')
           return numberOfHotels != newNumberOfHotels
-        })
+        }, 4000)
 
         scoreList = $$("#filter_review [data-id^='review_score']");
         var hotelsScoreList = $$('.sr_main_score_badge .review-score-badge');
-        var amountOfScore = scoreList[randomScoreIndex].getText().trim().slice(-2, -1);
+        var removeScoreText = -2
+        var removeScorePlus = -1
+        var scoreNumber = 1
+        var amountOfScore = scoreList[randomScoreIndex].getText().trim().slice(removeScoreText, removeScorePlus);
         amountOfScore = parseFloat(amountOfScore)
         for (var i = 0; i < hotelsScoreList.length; i++){
-          var rating = hotelsScoreList[i].getText().trim().slice(0,1)
+          var rating = hotelsScoreList[i].getText().trim().slice(0,scoreNumber)
           rating = parseFloat(rating)
           console.log('text for logs: ', rating, amountOfScore)
           assert.equal(rating >= amountOfScore, true)
@@ -181,16 +183,15 @@ describe('Booking.com testing: ', function() {
 
     it('User is required to specify booking date to see booking price', function () {
 
-        browser.url('https://www.booking.com');
         var cities = $$('.unified-postcard__header');
         var i = Math.floor(Math.random()*cities.length);
         cities[i].click();
 
         //assertions can be shortened. Use logical-specific assertions
-        assert.equal(browser.isVisible('#hotellist_inner'), true);
-        assert.equal(browser.isVisible('.c2-calendar-body'), true);
-        assert.equal(browser.isVisible('.room_details  .price'), false);
-        assert.equal(browser.isVisible('.sold_out_property'), false);
+        assert.equal(browser.isVisible('#hotellist_inner'), 4000, true);
+        assert.equal(browser.isVisible('.c2-calendar-body'), 4000, true);
+        assert.equal(browser.isVisible('.room_details  .price'), 4000, false);
+        assert.equal(browser.isVisible('.sold_out_property'), 4000, false);
 
         browser.click('.c2-calendar-close-button-icon');
 
@@ -200,12 +201,13 @@ describe('Booking.com testing: ', function() {
         var i = Math.floor(Math.random()*hotelsPrices.length);
         hotelsPrices[i].click();
 
-        assert.equal(browser.waitForVisible('.c2-calendar-body'), true);
+        assert.equal(browser.waitForVisible('.c2-calendar-body'), 4000, true);
 
         //get a randon month index (0-7)
         var nextMonthButton = $('.c2-button-further ');
+        var months = 7
         function randomMonth(){
-          var len = (Math.floor(Math.random()*7))
+          var len = (Math.floor(Math.random()*months))
           for (var i = 0; i < len; i ++){
             nextMonthButton.click()
           }
