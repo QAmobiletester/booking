@@ -1,5 +1,20 @@
 var assert = require('assert');
 
+/* 
+Do those dependencies really required:
+- selenium-webdriver
+- chromedriver
+- wdio-chromedriver-service
+- wdio-mocha-framework
+- wdio-selenium-standalone-service
+ */
+
+function getRandomInt(hiBoundary) {
+  return Math.floor(Math.random()*hiBoundary)
+}
+
+const searchBlock = new SearchBlock()
+
 describe('Booking.com testing: ', function() {
 
     beforeEach('open url', function() {
@@ -7,7 +22,12 @@ describe('Booking.com testing: ', function() {
     }, 1000);
 
     it('User is able to specify age of each child', function () {
-
+      //usage example. Class definition is at the end of the file
+      // searchBlock.setCity('citName')
+      // searchBlock.setCheckinDate(Date('01/01/2019'))
+      // searchBlock.setCheckoutDate(Date('01/06/2019'))
+      // searchBlock.setRoomsNumber(4)
+      // searchBlock.submit()
         browser.click('#xp__guests__toggle');
 
         //set a random amount of children
@@ -140,7 +160,6 @@ describe('Booking.com testing: ', function() {
           console.log('text for logs: ', hotelStars, numberOfStars)
           assert.equal(hotelStars, numberOfStars)
         }
-
         starsList[randomStarsIndex].click();
 
         //select review score option
@@ -150,7 +169,6 @@ describe('Booking.com testing: ', function() {
         numberOfHotels = browser.getText('.sr_header h1')
         scoreList[randomScoreIndex].click();
 
-        // the same mentioned above - default timeout for wait* methods is 500ms. Make sure it is enough everywhere where waits applied
         browser.waitUntil(function(){
           var newNumberOfHotels = browser.getText('.sr_header h1')
           return numberOfHotels != newNumberOfHotels
@@ -187,7 +205,7 @@ describe('Booking.com testing: ', function() {
         var i = Math.floor(Math.random()*cities.length);
         cities[i].click();
 
-        //assertions can be shortened. Use logical-specific assertions
+        //ops, seems like method signature violation
         assert.equal(browser.isVisible('#hotellist_inner'), 4000, true);
         assert.equal(browser.isVisible('.c2-calendar-body'), 4000, true);
         assert.equal(browser.isVisible('.room_details  .price'), 4000, false);
@@ -203,7 +221,7 @@ describe('Booking.com testing: ', function() {
 
         assert.equal(browser.waitForVisible('.c2-calendar-body'), 4000, true);
 
-        //get a randon month index (0-7)
+        //get a random month index (0-7)
         var nextMonthButton = $('.c2-button-further ');
         var months = 7
         function randomMonth(){
@@ -231,7 +249,16 @@ describe('Booking.com testing: ', function() {
         var hotelsWithPrice = $$('.room_details  .price').length;
         var soldOutHotels = $$('.sold_out_property').length;
 
-        assert.equal(allHotels - hotelsWithPrice === soldOutHotels, true);
+        assert.equal(allHotels - hotelsWithPrice , soldOutHotels);
     });
 
 });
+
+
+class SearchBlock {
+  getCity() { }
+  setCity(newCity) {
+
+  }
+  //complement and implement methods according provided class instance usage
+}
